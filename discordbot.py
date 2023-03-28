@@ -206,6 +206,18 @@ async def on_raw_reaction_remove(payload):
             role = guild.get_role(role_id)
             await member.remove_roles(role)
 
+@app.event
+async def on_message(message):
+    if message.content.startswith('아로나짱'):
+        channel = message.channel
+        await channel.send('MD Studio 관리 지원 Bot 아로나입니다! 제 역할이 궁금하다면 /아로나 를 입력해주세요')
+
+        def check(m):
+            return m.content == '/아로나' and m.channel == channel
+
+        msg = await app.wait_for('message', check=check)
+        await channel.send('MD Studio 관리 지원 Bot 아로나입니다 제 역할은 입장 인원들을 반갑게 맞이하고\n인원들을 한국인과 일본인으로 분류하고\n 관리자님들을 도와 KR채널의 보안을 책입집니다.\n  '.format(msg))
+        
 try:
     app.run(TOKEN)
 except discord.errors.LoginFailure as e:
