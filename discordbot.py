@@ -206,7 +206,7 @@ async def on_raw_reaction_remove(payload):
             role = guild.get_role(role_id)
             await member.remove_roles(role)
 
-  try:
+try:
     app.run(TOKEN)
 except discord.errors.LoginFailure as e:
     print("Improper token has been passed.")
