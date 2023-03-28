@@ -16,7 +16,7 @@ TOKEN = os.environ['TOKEN']
 intents = discord.Intents.all()
 intents.members = True
 
-app = commands.Bot(command_prefix='/', intents=intents)
+app = commands.Bot(command_prefix="/", intents=intents)
 message_counts = {}
 time_frames = {}
 red_cards = {}
@@ -212,10 +212,11 @@ async def on_message(message):
         channel = message.channel
         await channel.send('MD Studio 관리 지원 Bot 아로나입니다! 제 역할이 궁금하다면 /arona 를 입력해주세요')
 
-@app.event
-async def arona(ctx):
+@app.command
+async def Arona(ctx):
   await ctx.send("MD Studio 관리 지원 Bot 아로나입니다 제 역할은 입장 인원들을 반갑게 맞이하고\n인원들을 한국인과 일본인으로 분류하고\n 관리자님들을 도와 KR채널의 보안을 책임집니다.\n")
-try:
+
+  try:
     app.run(TOKEN)
 except discord.errors.LoginFailure as e:
     print("Improper token has been passed.")
