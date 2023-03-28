@@ -214,7 +214,7 @@ async def on_message(message):
 
 @app.command()
 async def arona(ctx):
-  await ctx.send("MD Studio 관리 지원 Bot 아로나입니다 제 역할은 입장 인원들을 반갑게 맞이하고\n인원들을 한국인과 일본인으로 분류하고\n 관리자님들을 도와 KR채널의 보안을 책임집니다.\n")
+    await ctx.send("MD Studio 관리 지원 Bot 아로나입니다 제 역할은 입장 인원들을 반갑게 맞이하고\n인원들을 한국인과 일본인으로 분류하고\n 관리자님들을 도와 KR채널의 보안을 책임집니다.\n")
 
   try:
     app.run(TOKEN)
