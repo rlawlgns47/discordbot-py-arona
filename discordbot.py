@@ -1,22 +1,19 @@
-from cmath import log
-from distutils.sysconfig import PREFIX
 import discord
-from dotenv import load_dotenv
-import os
+from discord import Embed
+import requests
 from discord.ext import commands
 from datetime import datetime, timedelta
 import threading
 import random
 import time
-load_dotenv()
-
-PREFIX = os.environ['PREFIX']
-TOKEN = os.environ['TOKEN']
+from bs4 import BeautifulSoup
+import asyncio
+import pytz
 
 intents = discord.Intents.all()
 intents.members = True
 
-app = commands.Bot(command_prefix="/", intents=intents)
+app = commands.Bot(command_prefix='/',intents=intents)
 message_counts = {}
 time_frames = {}
 red_cards = {}
@@ -24,6 +21,10 @@ red_cards = {}
 admin_id = 888839822184153089
 semiadmin_id = 888817303188287519
 semisemiadmin_id =1032632104367947866
+
+@app.slash_command(name="아로나의자기소개", description="아로나의 자기소개") # 슬래시 커맨드 등록
+async def arona(ctx: commands.Context): # 슬래시 커맨드 이름
+    await ctx.respond("MD Studio 한국 채널 지원 봇 아로나입니다! 역할 지급과 KR채널 & 글로벌 채널의 스팸 방지 등 채널보안을 담당하고 있습니다!") # 인터렉션 응답
 
 # Time interval to keep data in memory (in seconds)
 DATA_EXPIRATION_TIME = 3600
@@ -37,13 +38,41 @@ WARNING_MESSAGES = ["장문 도배인가요?! 하지마세요!.",
                    "장문은 도배로 판단하겠습니다! 하지마세요!"
                    ]
 
+# 네이버 날씨 페이지에서 서울의 날씨 정보를 가져오는 함수
+def get_seoul_weather():
+    url = "https://search.naver.com/search.naver?query=서울 날씨"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    temperature = soup.select_one('div.temperature_text strong').text.strip().replace('현재 온도','')
+    summary = soup.select_one('dl.summary_list')
+    temp_feel = summary.select_one('dt.term:contains("체감") + dd.desc').text
+    weather_desc = soup.select_one('span.weather.before_slash').text
+    fine_dust = soup.select_one('a:contains("미세먼지") span.txt').text
+    ultrafine_dust = soup.select_one('a:contains("초미세먼지") span.txt').text
+    lowest_temp = soup.select_one('.lowest').text.strip().replace('최저기온', '')
+    highest_temp = soup.select_one('.highest').text.strip().replace('최고기온', '')
+    rain_info = soup.select_one('div.cell_weather')
+    morning_rainfall = rain_info.select_one('span.weather_inner:nth-child(1) .rainfall').text
+    afternoon_rainfall = rain_info.select_one('span.weather_inner:nth-child(2) .rainfall').text
+
+
+    return {
+        "temperature": temperature,
+        "temp_feel": temp_feel,
+        "weather_desc" : weather_desc,
+        "fine_dust": fine_dust,
+        "ultrafine_dust": ultrafine_dust,
+        "lowest_temp": lowest_temp,
+        "highest_temp": highest_temp,
+        "morning_rainfall": morning_rainfall,
+        "afternoon_rainfall": afternoon_rainfall
+
+    }
 
 @app.event
 async def on_ready():
     print('Done')
     await app.change_presence(status=discord.Status.online, activity=None)
-
-
     channel = app.get_channel(1032650685180813312)
     message_id = 1087701328928706570
     message = None
@@ -56,6 +85,21 @@ async def on_ready():
         await message.add_reaction("🇰🇷")
         await message.add_reaction("🇯🇵")
 
+    # 매일 아침 7시에 서울 날씨 정보를 출력하는 작업 반복
+    while True:
+        now = datetime.now(pytz.timezone("Asia/Seoul"))
+        if now.hour == 7: #and now.minute == 25:
+            weather_info = get_seoul_weather()
+            embed = Embed(title="서울 기준 오늘의 날씨 정보를 알려드립니다!", color=0x00AAFF)
+            embed.add_field(name="현재기온", value=f"{weather_info['temperature']} (체감온도 {weather_info['temp_feel']})", inline=False)
+            embed.add_field(name="최고기온", value=weather_info['highest_temp'], inline=False)
+            embed.add_field(name="최저기온", value=weather_info['lowest_temp'], inline=False)
+            embed.add_field(name="날씨", value=f"{weather_info['weather_desc']}(오전 강수 확률 {weather_info['morning_rainfall']} / 오후 강수 확률 {weather_info['afternoon_rainfall']})", inline=False)
+            embed.add_field(name="미세먼지 농도", value=weather_info['fine_dust'], inline=False)
+            embed.add_field(name="초미세먼지 농도", value=weather_info['ultrafine_dust'], inline=False)
+            embed.set_footer(text="오늘도 화이팅입니다!")
+            await app.get_channel(888816297784262739).send(embed=embed) # 채널ID에는 메시지를 전송할 디스코드 채널의 ID를 입력해주세요.
+            await asyncio.sleep(60) #1분마다 체크
 
 def is_spamming(author_id):
     now = datetime.now()
