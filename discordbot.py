@@ -100,7 +100,7 @@ async def on_ready():
             embed.add_field(name="초미세먼지 농도", value=weather_info['ultrafine_dust'], inline=False)
             embed.set_footer(text="오늘도 화이팅입니다!")
             await app.get_channel(888816297784262739).send(embed=embed) # 채널ID에는 메시지를 전송할 디스코드 채널의 ID를 입력해주세요.
-        await asyncio.sleep(60) #1분마다 체크
+        await asyncio.sleep(3600) #1분마다 체크
 
 def is_spamming(author_id):
     now = datetime.now()
