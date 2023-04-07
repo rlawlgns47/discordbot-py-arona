@@ -10,6 +10,9 @@ from bs4 import BeautifulSoup
 import asyncio
 import pytz
 
+PREFIX = os.environ['PREFIX']
+TOKEN = os.environ['TOKEN']
+
 app = commands.Bot(command_prefix='/',intents=discord.Intents.all())
 message_counts = {}
 time_frames = {}
