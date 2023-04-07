@@ -19,10 +19,6 @@ admin_id = 888839822184153089
 semiadmin_id = 888817303188287519
 semisemiadmin_id =1032632104367947866
 
-@app.slash_command(name="아로나의자기소개", description="아로나의 자기소개") # 슬래시 커맨드 등록
-async def arona(ctx: commands.Context): # 슬래시 커맨드 이름
-    await ctx.respond("MD Studio 한국 채널 지원 봇 아로나입니다! 역할 지급과 KR채널 & 글로벌 채널의 스팸 방지 등 채널보안을 담당하고 있습니다!") # 인터렉션 응답
-
 # Time interval to keep data in memory (in seconds)
 DATA_EXPIRATION_TIME = 3600
 
@@ -79,7 +75,7 @@ async def send_weather():
             embed.add_field(name="미세먼지 농도", value=weather_info['fine_dust'], inline=False)
             embed.add_field(name="초미세먼지 농도", value=weather_info['ultrafine_dust'], inline=False)
             embed.set_footer(text="오늘도 화이팅입니다!")
-            await app.get_channel(1087870130932953089).send(embed=embed) # 채널ID에는 메시지를 전송할 디스코드 채널의 ID를 입력해주세요.
+            await app.get_channel(888816297784262739).send(embed=embed) # 채널ID에는 메시지를 전송할 디스코드 채널의 ID를 입력해주세요.
         await asyncio.sleep(60) #1분마다 체크
 
 @app.event
