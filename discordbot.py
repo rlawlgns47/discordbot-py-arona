@@ -13,7 +13,7 @@ import pytz
 intents = discord.Intents.all()
 intents.members = True
 
-app = commands.Bot(command_prefix='/',intents=intents)
+app = discord.Bot(command_prefix='/',intents=intents)
 message_counts = {}
 time_frames = {}
 red_cards = {}
