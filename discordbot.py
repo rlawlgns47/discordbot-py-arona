@@ -10,10 +10,7 @@ from bs4 import BeautifulSoup
 import asyncio
 import pytz
 
-intents = discord.Intents.all()
-intents.members = True
-
-app = discord.Bot(command_prefix='/',intents=intents)
+app = discord.Bot(command_prefix='/',intents=discord.Intents.all())
 message_counts = {}
 time_frames = {}
 red_cards = {}
