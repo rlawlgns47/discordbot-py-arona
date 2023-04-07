@@ -1,3 +1,5 @@
+from cmath import log
+from distutils.sysconfig import PREFIX
 import discord
 from discord import Embed
 import requests
