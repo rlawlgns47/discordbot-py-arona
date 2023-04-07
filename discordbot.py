@@ -1,4 +1,5 @@
 import discord
+import discord_slash
 from discord import Embed
 import requests
 from discord.ext import commands
@@ -9,11 +10,13 @@ import time
 from bs4 import BeautifulSoup
 import asyncio
 import pytz
+from discord_slash import SlashCommand
 
 intents = discord.Intents.all()
 intents.members = True
 
 app = commands.Bot(command_prefix='/',intents=intents)
+slash = SlashCommand(app, sync_commands=True) # 생성자에 client 인스턴스 전달
 message_counts = {}
 time_frames = {}
 red_cards = {}
@@ -22,7 +25,7 @@ admin_id = 888839822184153089
 semiadmin_id = 888817303188287519
 semisemiadmin_id =1032632104367947866
 
-@app.slash_command(name="아로나의자기소개", description="아로나의 자기소개") # 슬래시 커맨드 등록
+@slash.slash(name="아로나의자기소개", description="아로나의 자기소개") # 슬래시 커맨드 등록
 async def arona(ctx: commands.Context): # 슬래시 커맨드 이름
     await ctx.respond("MD Studio 한국 채널 지원 봇 아로나입니다! 역할 지급과 KR채널 & 글로벌 채널의 스팸 방지 등 채널보안을 담당하고 있습니다!") # 인터렉션 응답
 
