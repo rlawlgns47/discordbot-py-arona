@@ -89,7 +89,7 @@ async def on_ready():
 
     while True:
         now = datetime.now(pytz.timezone("Asia/Seoul"))
-        if now.hour == 1 and now.minute == 33:
+        if now.hour == 7: #and now.minute == 33:
             weather_info = get_seoul_weather()
             embed = Embed(title="서울 기준 오늘의 날씨 정보를 알려드립니다!", color=0x00AAFF)
             embed.add_field(name="현재기온", value=f"{weather_info['temperature']} (체감온도 {weather_info['temp_feel']})", inline=False)
