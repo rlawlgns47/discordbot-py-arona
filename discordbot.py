@@ -9,6 +9,7 @@ import time
 from bs4 import BeautifulSoup
 import asyncio
 import pytz
+from discord_slash import SlashCommand, SlashContext
 
 intents = discord.Intents.all()
 intents.members = True
