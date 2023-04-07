@@ -9,7 +9,6 @@ import time
 from bs4 import BeautifulSoup
 import asyncio
 import pytz
-from discord_slash import SlashCommand, SlashContext
 
 intents = discord.Intents.all()
 intents.members = True
@@ -70,6 +69,22 @@ def get_seoul_weather():
 
     }
 
+async def send_weather():
+    while True:
+        now = datetime.now(pytz.timezone("Asia/Seoul"))
+        if now.hour == 7: # and now.minute == 5:
+            weather_info = get_seoul_weather()
+            embed = Embed(title="서울 기준 오늘의 날씨 정보를 알려드립니다!", color=0x00AAFF)
+            embed.add_field(name="현재기온", value=f"{weather_info['temperature']} (체감온도 {weather_info['temp_feel']})", inline=False)
+            embed.add_field(name="최고기온", value=weather_info['highest_temp'], inline=False)
+            embed.add_field(name="최저기온", value=weather_info['lowest_temp'], inline=False)
+            embed.add_field(name="날씨", value=f"{weather_info['weather_desc']}(오전 강수 확률 {weather_info['morning_rainfall']} / 오후 강수 확률 {weather_info['afternoon_rainfall']})", inline=False)
+            embed.add_field(name="미세먼지 농도", value=weather_info['fine_dust'], inline=False)
+            embed.add_field(name="초미세먼지 농도", value=weather_info['ultrafine_dust'], inline=False)
+            embed.set_footer(text="오늘도 화이팅입니다!")
+            await app.get_channel(1087870130932953089).send(embed=embed) # 채널ID에는 메시지를 전송할 디스코드 채널의 ID를 입력해주세요.
+        await asyncio.sleep(60) #1분마다 체크
+
 @app.event
 async def on_ready():
     print('Done')
@@ -86,21 +101,8 @@ async def on_ready():
         await message.add_reaction("🇰🇷")
         await message.add_reaction("🇯🇵")
 
-    # 매일 아침 7시에 서울 날씨 정보를 출력하는 작업 반복
-    while True:
-        now = datetime.now(pytz.timezone("Asia/Seoul"))
-        if now.hour == 7: #and now.minute == 25:
-            weather_info = get_seoul_weather()
-            embed = Embed(title="서울 기준 오늘의 날씨 정보를 알려드립니다!", color=0x00AAFF)
-            embed.add_field(name="현재기온", value=f"{weather_info['temperature']} (체감온도 {weather_info['temp_feel']})", inline=False)
-            embed.add_field(name="최고기온", value=weather_info['highest_temp'], inline=False)
-            embed.add_field(name="최저기온", value=weather_info['lowest_temp'], inline=False)
-            embed.add_field(name="날씨", value=f"{weather_info['weather_desc']}(오전 강수 확률 {weather_info['morning_rainfall']} / 오후 강수 확률 {weather_info['afternoon_rainfall']})", inline=False)
-            embed.add_field(name="미세먼지 농도", value=weather_info['fine_dust'], inline=False)
-            embed.add_field(name="초미세먼지 농도", value=weather_info['ultrafine_dust'], inline=False)
-            embed.set_footer(text="오늘도 화이팅입니다!")
-            await app.get_channel(888816297784262739).send(embed=embed) # 채널ID에는 메시지를 전송할 디스코드 채널의 ID를 입력해주세요.
-            await asyncio.sleep(60) #1분마다 체크
+    
+    await send_weather()
 
 def is_spamming(author_id):
     now = datetime.now()
