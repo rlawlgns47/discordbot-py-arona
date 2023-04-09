@@ -205,7 +205,7 @@ async def on_message(message):
             
     elif message.channel.id == target_channel_id and message.content != '':
         original_text = message.content
-        translated_text = translator.translate(original_text, dest='kr').text
+        translated_text = translator.translate(original_text, dest='k').text
         if original_text != translated_text:
             embed = Embed(title=f"{message.author.display_name}님의 채팅을 번역했습니다!", color=0x00AAFF)
             embed.add_field(name="", value=translated_text, inline=False)
