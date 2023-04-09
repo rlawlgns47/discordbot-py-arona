@@ -91,7 +91,7 @@ async def on_ready():
 
     while True:
         now = datetime.now(pytz.timezone("Asia/Seoul"))
-        if now.hour == 7: #and now.minute == 33:
+        if now.hour == 7 and now.minute == 0:
             weather_info = get_seoul_weather()
             embed = Embed(title="서울 기준 오늘의 날씨 정보를 알려드립니다!", color=0x00AAFF)
             embed.add_field(name="현재기온", value=f"{weather_info['temperature']} (체감온도 {weather_info['temp_feel']})", inline=False)
@@ -102,7 +102,7 @@ async def on_ready():
             embed.add_field(name="초미세먼지 농도", value=weather_info['ultrafine_dust'], inline=False)
             embed.set_footer(text="오늘도 화이팅입니다!")
             await app.get_channel(888816297784262739).send(embed=embed) # 채널ID에는 메시지를 전송할 디스코드 채널의 ID를 입력해주세요.
-        await asyncio.sleep(3600) #1분마다 체크
+        await asyncio.sleep(60) #1분마다 체크
 
 def is_spamming(author_id):
     now = datetime.now()
