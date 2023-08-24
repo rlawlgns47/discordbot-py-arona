@@ -202,30 +202,30 @@ async def on_message(message):
             await member.add_roles(role)
             await message.channel.send(f"{message.author.mention}, {role.name} 역할을 부여했습니다! {adrole.mention},{sadrole.mention},{ssrole.mention} 관리자님이 오실때까지 대기해주세요!.")
           
-        if message.author == app.user:
-            return
-        text = message.content
-        if text.startswith('아로나 '):
-            user_input = text[5:]
+    if message.author == app.user:
+        return
+    text = message.content
+    if text.startswith('아로나 '):
+        user_input = text[5:]
 
-            # 이전 대화 내용을 포함하여 대화 진행
-            conversation_history.append({"role": "user", "content": user_input})
+        # 이전 대화 내용을 포함하여 대화 진행
+        conversation_history.append({"role": "user", "content": user_input})
 
-            bot_response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "MD 스튜디오 디스코드 채널 서포트 AI 아로나입니다!."},
-                    {"role": "user", "content": user_input}
-                ] + conversation_history,  # 이전 대화 내용 추가
-                temperature=0.5
-            )
+        bot_response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "MD 스튜디오 디스코드 채널 서포트 AI 아로나입니다!."},
+                {"role": "user", "content": user_input}
+            ] + conversation_history,  # 이전 대화 내용 추가
+            temperature=0.5
+        )
 
-            # 대화 내용 업데이트
-            conversation_history.append({"role": "assistant", "content": bot_response['choices'][0]['message']['content']})
+        # 대화 내용 업데이트
+        conversation_history.append({"role": "assistant", "content": bot_response['choices'][0]['message']['content']})
         
-            #print(bot_response)
-            bot_text = '\n'.join([choice['message']['content'] for choice in bot_response['choices']])
-            await message.channel.send(f"{bot_text}")
+        #print(bot_response)
+        bot_text = '\n'.join([choice['message']['content'] for choice in bot_response['choices']])
+        await message.channel.send(f"{bot_text}")
     return
 
 
