@@ -14,10 +14,11 @@ import time
 from bs4 import BeautifulSoup
 import asyncio
 import pytz
-from googletrans import Translator
+import openai
 
 PREFIX = os.environ['PREFIX']
 TOKEN = os.environ['TOKEN']
+OPENAI_API_KEY = os.environ['GPT']
 
 app = commands.Bot(command_prefix='/',intents=discord.Intents.all())
 translator = Translator()
@@ -28,6 +29,11 @@ red_cards = {}
 admin_id = 888839822184153089
 semiadmin_id = 888817303188287519
 semisemiadmin_id =1032632104367947866
+
+openai.api_key = OPENAI_API_KEY
+
+# 이전 대화 내용을 담을 리스트
+conversation_history = []
 
 # Time interval to keep data in memory (in seconds)
 DATA_EXPIRATION_TIME = 3600
@@ -155,12 +161,6 @@ async def on_message(message):
 
     if message.author == app.user:
         return
-    target_channel_id = 888816297784262739 # 번역 대상 채널의 ID를 입력해주세요.
-
-    if message.content.startswith(app.command_prefix):
-        # Process commands in a separate thread
-        await app.loop.run_in_executor(None, app.process_commands, message)
-        return
     
     # 메세지 길이가 최대 글자수 돌파하는지 체크
     if message_length > threshold:
@@ -202,15 +202,31 @@ async def on_message(message):
             member = guild.get_member(message.author.id)
             await member.add_roles(role)
             await message.channel.send(f"{message.author.mention}, {role.name} 역할을 부여했습니다! {adrole.mention},{sadrole.mention},{ssrole.mention} 관리자님이 오실때까지 대기해주세요!.")
-            
-    elif message.channel.id == target_channel_id and message.content != '':
-        original_text = message.content
-        translated_text = translator.translate(original_text, dest='ko').text
-        if original_text != translated_text:
-            embed = Embed(title=f"{message.author.display_name}님의 채팅을 번역했습니다!", color=0x00AAFF)
-            embed.add_field(name="", value=translated_text, inline=False)
-            await message.channel.send(embed=embed)            
+          
+        if message.author == app.user:
+            return
+        text = message.content
+        if text.startswith('아로나 '):
+            user_input = text[5:]
 
+            # 이전 대화 내용을 포함하여 대화 진행
+            conversation_history.append({"role": "user", "content": user_input})
+
+            bot_response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "MD 스튜디오 디스코드 채널 서포트 AI 아로나입니다!."},
+                    {"role": "user", "content": user_input}
+                ] + conversation_history,  # 이전 대화 내용 추가
+                temperature=0.5
+            )
+
+            # 대화 내용 업데이트
+            conversation_history.append({"role": "assistant", "content": bot_response['choices'][0]['message']['content']})
+        
+            #print(bot_response)
+            bot_text = '\n'.join([choice['message']['content'] for choice in bot_response['choices']])
+            await message.channel.send(f"{bot_text}")
     return
 
 
