@@ -149,7 +149,7 @@ def add_red_card(user_id):
 
 @app.event
 async def on_message(message):
-
+    global last_conversation_reset_time
     spam_messages = [
     f"{message.author.mention}님, 도배는 금물입니다!",
     f"{message.author.mention}님, 도배하지 마세요!",
