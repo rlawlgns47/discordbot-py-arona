@@ -21,7 +21,6 @@ TOKEN = os.environ['TOKEN']
 OPENAI_API_KEY = os.environ['GPT']
 
 app = commands.Bot(command_prefix='/',intents=discord.Intents.all())
-translator = Translator()
 message_counts = {}
 time_frames = {}
 red_cards = {}
