@@ -206,7 +206,7 @@ async def on_message(message):
         return
     text = message.content
     if text.startswith('아로나 '):
-        user_input = text[5:]
+        user_input = text[4:]
 
         # 이전 대화 내용을 포함하여 대화 진행
         conversation_history.append({"role": "user", "content": user_input})
