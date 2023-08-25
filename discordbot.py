@@ -212,7 +212,7 @@ async def on_message(message):
         current_time = time.time()
         time_elapsed = current_time - last_conversation_reset_time
         
-        if time_elapsed >= 600:  # 10분(600초)이 경과하면 대화 초기화
+        if time_elapsed >= 300:  # 10분(600초)이 경과하면 대화 초기화
             conversation_history.clear()
             last_conversation_reset_time = current_time
           
