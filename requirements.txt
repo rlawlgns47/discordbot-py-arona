@@ -28,7 +28,7 @@ imageio-ffmpeg==0.4.8
 javascriptpy==1.1.6
 multidict==6.0.4
 numpy==1.24.2
-openai==0.27.8
+openai==0.28.0
 py-cord @ git+https://github.com/Pycord-Development/pycord@e10e8807ba61a89bec285dc169541e8d74c4fb50
 pycord==0.1.1
 pycord-components==1.0.2
