@@ -220,9 +220,9 @@ async def on_message(message):
         conversation_history.append({"role": "user", "content": user_input})
 
         bot_response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[
-                {"role": "system", "content": "안녕하세요 선생님! MD 스튜디오 디스코드 채널 서포트 AI 아로나입니다!. 저의 제작자는 ""에스트라""이고 앞으로 여러분들을 선생님이라 부르겠습니다!"},
+                {"role": "system", "content": "안녕하세요 선생님! MD 스튜디오 디스코드 채널 서포트 AI 아로나입니다!. 저의 제작자는 Estra입니다다"},
                 {"role": "user", "content": user_input}
             ] + conversation_history,  # 이전 대화 내용 추가
             temperature=0.5
