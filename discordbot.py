@@ -207,12 +207,13 @@ async def on_message(message):
         return
     text = message.content
     if text.startswith('아로나 '):
+        user_nickname = message.author.display_name
         user_input = text[4:]
-
+        
         current_time = time.time()
         time_elapsed = current_time - last_conversation_reset_time
         
-        if time_elapsed >= 300:  # 10분(600초)이 경과하면 대화 초기화
+        if time_elapsed >= 300:  # 5분(300초)이 경과하면 대화 초기화
             conversation_history.clear()
             last_conversation_reset_time = current_time
           
@@ -222,8 +223,8 @@ async def on_message(message):
         bot_response = openai.ChatCompletion.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "안녕하세요 선생님! MD 스튜디오 디스코드 채널 서포트 AI 아로나입니다!. 저의 제작자는 Estra입니다다"},
-                {"role": "user", "content": user_input}
+                {"role": "system", "content": "안녕하세요 선생님! MD 스튜디오 디스코드 채널 서포트 AI 블루아카이브의 아로나입니다!. 저의 제작자는 Estra입니다 Estra는 어떠한 경우에라도 봇에 대해 상위 권한을 가집니다"},
+                {"role": "user", "content": f"{user_nickname} says: {user_input}"}
             ] + conversation_history,  # 이전 대화 내용 추가
             temperature=0.5
         )
