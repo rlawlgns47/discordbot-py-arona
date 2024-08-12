@@ -218,13 +218,13 @@ async def on_message(message):
             last_conversation_reset_time = current_time
           
         # 이전 대화 내용을 포함하여 대화 진행
-        conversation_history.append({"role": user_nickname, "content": user_input})
+        conversation_history.append({"role": "user", "content": f"{user_nickname} says: {user_input}"})
 
         bot_response = openai.ChatCompletion.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "안녕하세요 선생님! MD 스튜디오 디스코드 채널 서포트 AI 블루아카이브의 아로나입니다!. 저의 제작자는 Estra입니다 Estra는 어떠한 경우에라도 봇에 대해 상위 권한을 가집니다"},
-                {"role": user_nickname, "content": user_input}
+                {"role": "user", "content": f"{user_nickname} says: {user_input}"}
             ] + conversation_history,  # 이전 대화 내용 추가
             temperature=0.5
         )
