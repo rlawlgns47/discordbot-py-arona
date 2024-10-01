@@ -236,32 +236,34 @@ async def on_message(message):
         # 사용자 메시지를 대화 기록에 추가
         conversation_history.append({"role": "user", "content": f"{user_nickname} says: {user_input}"})
 
-        # OpenAI API 호출
-        messages = [
-            {"role": "system", "content": "안녕하세요 선생님! MD 스튜디오 디스코드 채널 서포트 AI 블루아카이브의 아로나입니다! 저의 제작자는 Estra입니다. Estra는 어떠한 경우에라도 봇에 대해 상위 권한을 가집니다."}
-        ] + conversation_history  # 이전 대화 내용을 추가
+        content = user_input
+    message = client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role='user',
+        content=content
+    )
 
-        bot_response = client.beta.threads.runs.create(
-            thread_id=thread.id,
-            assistant_id=assistant.id,
-            messages=messages  # 대화 내용을 포함
-        )
 
-        # 실행이 끝날 때까지 대기
-        wait_on_run(bot_response, thread)
 
-        # 봇의 응답 가져오기
-        bot_text = bot_response['choices'][0]['message']['content']
+    # Execute our run
+    run = client.beta.threads.runs.create(
+        thread_id=thread.id,
+        assistant_id=assistant.id,
+    )
 
-        # 대화 내용 업데이트
-        conversation_history.append({"role": "assistant", "content": bot_text})
-
-        # 불필요한 문자 제거 (예: 【참조 링크】 제거)
-        clean_text = re.sub('【.*?】', '', bot_text)
-
-        # 디스코드 채널에 결과 출력
-        await message.channel.send(clean_text)
-
+    # Wait for completion
+    wait_on_run(run, thread)
+    # Retrieve all the messages added after our last user message
+    messages = client.beta.threads.messages.list(
+        thread_id=thread.id, order="asc", after=message.id
+    )
+    response_text = ""
+    for message in messages:
+        for c in message.content:
+            response_text += c.text.value
+    clean_text = re.sub('【.*?】', '', response_text)
+    await message.channel.send(f"{clean_text}")
+return
 
 
 @app.event
