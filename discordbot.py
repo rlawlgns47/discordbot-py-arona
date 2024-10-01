@@ -263,12 +263,12 @@ async def on_message(message):
     await message.channel.send(f"{clean_text}")
 
     current_time = time.time()
-        time_elapsed = current_time - last_conversation_reset_time
+    time_elapsed = current_time - last_conversation_reset_time
 
-        # 5분이 지나면 대화 기록 초기화
-        if time_elapsed >= 300:
-            thread_messages.clear()
-            last_conversation_reset_time = current_time
+    # 5분이 지나면 대화 기록 초기화
+    if time_elapsed >= 300:
+        thread_messages.clear()
+        last_conversation_reset_time = current_time
     return
 
 
