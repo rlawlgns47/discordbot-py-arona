@@ -233,16 +233,6 @@ async def on_message(message):
     if text.startswith('아로나 '):  # 특정 키워드로 시작하는 메시지만 처리
         user_nickname = message.author.display_name
         user_input = text[4:]
-  
-        current_time = time.time()
-        time_elapsed = current_time - last_conversation_reset_time
-
-        # 5분이 지나면 대화 기록 초기화
-        if time_elapsed >= 300:
-            thread_messages.clear()
-            last_conversation_reset_time = current_time
-
-        
 
         content = user_input
         thread_message = client.beta.threads.messages.create(
@@ -271,6 +261,14 @@ async def on_message(message):
             response_text += c.text.value
     clean_text = re.sub('【.*?】', '', response_text)
     await message.channel.send(f"{clean_text}")
+
+    current_time = time.time()
+        time_elapsed = current_time - last_conversation_reset_time
+
+        # 5분이 지나면 대화 기록 초기화
+        if time_elapsed >= 300:
+            thread_messages.clear()
+            last_conversation_reset_time = current_time
     return
 
 
