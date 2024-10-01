@@ -263,7 +263,7 @@ async def on_message(message):
             response_text += c.text.value
     clean_text = re.sub('【.*?】', '', response_text)
     await message.channel.send(f"{clean_text}")
-return
+    return
 
 
 @app.event
