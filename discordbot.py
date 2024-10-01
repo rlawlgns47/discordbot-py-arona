@@ -246,10 +246,10 @@ async def on_message(message):
         conversation_history.append({"role": "user", "content": f"{user_nickname} says: {user_input}"})
 
         content = user_input
-    message = client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role='user',
-        content=content
+        message = client.beta.threads.messages.create(
+          thread_id=thread.id,
+          role='user',
+          content=content
     )
 
 
