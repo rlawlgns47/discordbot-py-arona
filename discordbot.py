@@ -14,7 +14,7 @@ import time
 from bs4 import BeautifulSoup
 import asyncio
 import pytz
-from openai import OpenAI
+import openai
 import re
 
 PREFIX = os.environ['PREFIX']
@@ -30,7 +30,7 @@ admin_id = 888839822184153089
 semiadmin_id = 888817303188287519
 semisemiadmin_id =1032632104367947866
 
-client = OpenAI(
+client = openai(
   api_key = OPENAI_API_KEY
 )
 
