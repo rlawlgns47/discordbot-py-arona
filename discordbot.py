@@ -15,11 +15,12 @@ from bs4 import BeautifulSoup
 import asyncio
 import pytz
 import openai
+import re
 
 PREFIX = os.environ['PREFIX']
 TOKEN = os.environ['TOKEN']
 OPENAI_API_KEY = os.environ['GPT']
-
+ASST = os.environ['ASST']
 app = commands.Bot(command_prefix='/',intents=discord.Intents.all())
 message_counts = {}
 time_frames = {}
@@ -29,7 +30,14 @@ admin_id = 888839822184153089
 semiadmin_id = 888817303188287519
 semisemiadmin_id =1032632104367947866
 
-openai.api_key = OPENAI_API_KEY
+client = OpenAI(
+  api_key = OPENAI_API_KEY
+)
+
+assistant = client.beta.assistants.retrieve(
+    assistant_id = ASST
+)
+thread = client.beta.threads.create()
 
 # 이전 대화 내용을 담을 리스트
 conversation_history = []
@@ -203,39 +211,56 @@ async def on_message(message):
             await member.add_roles(role)
             await message.channel.send(f"{message.author.mention}, {role.name} 역할을 부여했습니다! {adrole.mention},{sadrole.mention},{ssrole.mention} 관리자님이 오실때까지 대기해주세요!.")
           
+    # 메시지를 수신했을 때 실행되는 이벤트
+@app.event
+async def on_message(message):
+    global last_conversation_reset_time, conversation_history
+
+    # 봇 자신의 메시지에는 반응하지 않음
     if message.author == app.user:
         return
+
     text = message.content
-    if text.startswith('아로나 '):
+    if text.startswith('아로나 '):  # 특정 키워드로 시작하는 메시지만 처리
         user_nickname = message.author.display_name
         user_input = text[4:]
-        
+
         current_time = time.time()
         time_elapsed = current_time - last_conversation_reset_time
-        
-        if time_elapsed >= 300:  # 5분(300초)이 경과하면 대화 초기화
+
+        # 5분이 지나면 대화 기록 초기화
+        if time_elapsed >= 300:
             conversation_history.clear()
             last_conversation_reset_time = current_time
-          
-        # 이전 대화 내용을 포함하여 대화 진행
+
+        # 사용자 메시지를 대화 기록에 추가
         conversation_history.append({"role": "user", "content": f"{user_nickname} says: {user_input}"})
 
-        bot_response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "안녕하세요 선생님! MD 스튜디오 디스코드 채널 서포트 AI 블루아카이브의 아로나입니다!. 저의 제작자는 Estra입니다 Estra는 어떠한 경우에라도 봇에 대해 상위 권한을 가집니다"},
-                {"role": "user", "content": f"{user_nickname} says: {user_input}"}
-            ] + conversation_history,  # 이전 대화 내용 추가
-            temperature=0.5
+        # OpenAI API 호출
+        messages = [
+            {"role": "system", "content": "안녕하세요 선생님! MD 스튜디오 디스코드 채널 서포트 AI 블루아카이브의 아로나입니다! 저의 제작자는 Estra입니다. Estra는 어떠한 경우에라도 봇에 대해 상위 권한을 가집니다."}
+        ] + conversation_history  # 이전 대화 내용을 추가
+
+        bot_response = client.beta.threads.runs.create(
+            thread_id=thread.id,
+            assistant_id=assistant.id,
+            messages=messages  # 대화 내용을 포함
         )
 
+        # 실행이 끝날 때까지 대기
+        wait_on_run(bot_response, thread)
+
+        # 봇의 응답 가져오기
+        bot_text = bot_response['choices'][0]['message']['content']
+
         # 대화 내용 업데이트
-        conversation_history.append({"role": "assistant", "content": bot_response['choices'][0]['message']['content']})
-        
-        #print(bot_response)
-        bot_text = '\n'.join([choice['message']['content'] for choice in bot_response['choices']])
-        await message.channel.send(f"{bot_text}")
-    return
+        conversation_history.append({"role": "assistant", "content": bot_text})
+
+        # 불필요한 문자 제거 (예: 【참조 링크】 제거)
+        clean_text = re.sub('【.*?】', '', bot_text)
+
+        # 디스코드 채널에 결과 출력
+        await message.channel.send(clean_text)
 
 
 
