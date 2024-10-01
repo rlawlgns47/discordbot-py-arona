@@ -14,7 +14,7 @@ import time
 from bs4 import BeautifulSoup
 import asyncio
 import pytz
-import openai
+from openai import OpenAI
 import re
 
 PREFIX = os.environ['PREFIX']
