@@ -239,17 +239,16 @@ async def on_message(message):
 
         # 5분이 지나면 대화 기록 초기화
         if time_elapsed >= 300:
-            conversation_history.clear()
+            thread_messages.clear()
             last_conversation_reset_time = current_time
 
-        # 사용자 메시지를 대화 기록에 추가
-        conversation_history.append({"role": "user", "content": f"{user_nickname} says: {user_input}"})
+        
 
         content = user_input
         thread_message = client.beta.threads.messages.create(
           thread_id=thread.id,
           role='user',
-          content=content + conversation_history
+          content=content
     )
 
 
