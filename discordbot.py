@@ -230,16 +230,6 @@ async def on_message(message):
     if message.author == app.user:
         return
 
-    # 5분마다 대화 기록을 초기화
-    current_time = time.time()
-    time_elapsed = current_time - last_conversation_reset_time
-
-    # 시간 초과 시 대화 기록 초기화
-    if time_elapsed >= 300:
-        print("5분 경과: 대화 기록을 초기화합니다.")
-        conversation_history = []  # 대화 기록 초기화
-        last_conversation_reset_time = current_time  # 시간 업데이트
-
     text = message.content
     if text.startswith('아로나 '):  # 특정 키워드로 시작하는 메시지만 처리
         user_nickname = message.author.display_name
@@ -247,17 +237,13 @@ async def on_message(message):
 
         content = user_input
         thread_message = client.beta.threads.messages.create(
-            thread_id=thread.id,
-            role='user',
-            content=f"{user_nickname} says: {content}"
-        )
+          thread_id=thread.id,
+          role='user',
+          content=content
+          content = f"{user_nickname} says: {content}"
+    )
 
-        # 대화 기록 저장
-        conversation_history.append({
-            'user': user_nickname,
-            'message': content,
-            'time': current_time
-        })
+
 
     # Execute our run
     run = client.beta.threads.runs.create(
@@ -267,21 +253,25 @@ async def on_message(message):
 
     # Wait for completion
     wait_on_run(run, thread)
-
     # Retrieve all the messages added after our last user message
     thread_messages = client.beta.threads.messages.list(
         thread_id=thread.id, order="asc", after=thread_message.id
     )
-
     response_text = ""
     for thread_message in thread_messages:
         for c in thread_message.content:
             response_text += c.text.value
-
     clean_text = re.sub('【.*?】', '', response_text)
-
-    # 메시지 전송
     await message.channel.send(f"{clean_text}")
+
+    current_time = time.time()
+    time_elapsed = current_time - last_conversation_reset_time
+
+    # 5분이 지나면 대화 기록 초기화
+    if time_elapsed >= 300:
+        thread_messages.clear()
+        last_conversation_reset_time = current_time
+    return
 
 
 @app.event
