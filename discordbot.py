@@ -37,7 +37,7 @@ client = OpenAI(
 assistant = client.beta.assistants.retrieve(
     assistant_id = ASST
 )
-thread = client.beta.threads.create()
+
 
 # 이전 대화 내용을 담을 리스트
 # 전역 변수 선언
@@ -234,7 +234,9 @@ async def on_message(message):
     if text.startswith('아로나 '):  # 특정 키워드로 시작하는 메시지만 처리
         user_nickname = message.author.display_name
         user_input = text[4:]
-
+      
+        thread = client.beta.threads.create()
+      
         content = user_input
         thread_message = client.beta.threads.messages.create(
           thread_id=thread.id,
@@ -271,7 +273,6 @@ async def on_message(message):
         # delete thread
         thread = client.beta.threads.delete(thread.id)
         print("뇌 비웠다 후헤헤")
-        thread = client.beta.threads.create()
         last_conversation_reset_time = current_time
     return
 
