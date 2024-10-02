@@ -235,7 +235,7 @@ async def on_message(message):
         user_input = text[4:]
 
         content = user_input
-        thread_message = client.beta.threads.messages.create(
+        thread_message = await client.beta.threads.messages.create(
           thread_id=thread.id,
           role='user',
           content = f"{user_nickname} says: {content}"
