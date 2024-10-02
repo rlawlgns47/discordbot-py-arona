@@ -40,8 +40,9 @@ assistant = client.beta.assistants.retrieve(
 thread = client.beta.threads.create()
 
 # 이전 대화 내용을 담을 리스트
-conversation_history = []
+# 전역 변수 선언
 last_conversation_reset_time = time.time()
+conversation_history = []
 
 # Time interval to keep data in memory (in seconds)
 DATA_EXPIRATION_TIME = 3600
@@ -233,8 +234,9 @@ async def on_message(message):
     current_time = time.time()
     time_elapsed = current_time - last_conversation_reset_time
 
+    # 시간 초과 시 대화 기록 초기화
     if time_elapsed >= 300:
-        # 5분이 지나면 대화 기록 초기화
+        print("5분 경과: 대화 기록을 초기화합니다.")
         conversation_history = []  # 대화 기록 초기화
         last_conversation_reset_time = current_time  # 시간 업데이트
 
@@ -245,9 +247,9 @@ async def on_message(message):
 
         content = user_input
         thread_message = client.beta.threads.messages.create(
-          thread_id=thread.id,
-          role='user',
-          content = f"{user_nickname} says: {content}"
+            thread_id=thread.id,
+            role='user',
+            content=f"{user_nickname} says: {content}"
         )
 
         # 대화 기록 저장
@@ -275,11 +277,11 @@ async def on_message(message):
     for thread_message in thread_messages:
         for c in thread_message.content:
             response_text += c.text.value
+
     clean_text = re.sub('【.*?】', '', response_text)
 
     # 메시지 전송
     await message.channel.send(f"{clean_text}")
-    return
 
 
 @app.event
