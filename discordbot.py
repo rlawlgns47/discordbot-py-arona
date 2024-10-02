@@ -271,7 +271,7 @@ async def on_message(message):
         time_elapsed = current_time - last_conversation_reset_time
 
         # 5분이 지나면 대화 기록 초기화
-        if time_elapsed >= 300:
+        if time_elapsed >= 60:
             # delete thread
             client.beta.threads.delete(global_thread.id)
             global_thread = None  # 스레드 초기화
