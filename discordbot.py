@@ -38,10 +38,10 @@ assistant = client.beta.assistants.retrieve(
     assistant_id = ASST
 )
 
-thread = client.beta.threads.create()
 
 # 이전 대화 내용을 담을 리스트
 # 전역 변수 선언
+global_thread = None
 last_conversation_reset_time = time.time()
 conversation_history = []
 
@@ -225,7 +225,7 @@ async def on_message(message):
     # 메시지를 수신했을 때 실행되는 이벤트
 @app.event
 async def on_message(message):
-    global last_conversation_reset_time, conversation_history
+    global last_conversation_reset_time, conversation_history, global_thread
 
     # 봇 자신의 메시지에는 반응하지 않음
     if message.author == app.user:
@@ -236,47 +236,46 @@ async def on_message(message):
         user_nickname = message.author.display_name
         user_input = text[4:]
 
+        # 통합 스레드가 존재하지 않으면 생성
+        if global_thread is None:
+            global_thread = client.beta.threads.create()
+
+        content = user_input
+        thread_message = client.beta.threads.messages.create(
+            thread_id=global_thread.id,
+            role='user',
+            content=f"{user_nickname} : {content}"
+        )
+
+        # Execute our run
+        run = client.beta.threads.runs.create(
+            thread_id=global_thread.id,
+            assistant_id=assistant.id,
+        )
+
+        # Wait for completion
+        wait_on_run(run, global_thread)
+
+        # Retrieve all the messages added after our last user message
+        thread_messages = client.beta.threads.messages.list(
+            thread_id=global_thread.id, order="asc", after=thread_message.id
+        )
+        response_text = ""
+        for thread_message in thread_messages:
+            for c in thread_message.content:
+                response_text += c.text.value
+        clean_text = re.sub('【.*?】', '', response_text)
+        await message.channel.send(f"{clean_text}")
+
         current_time = time.time()
         time_elapsed = current_time - last_conversation_reset_time
 
         # 5분이 지나면 대화 기록 초기화
         if time_elapsed >= 300:
             # delete thread
-            thread = client.beta.threads.delete(thread.id)
+            client.beta.threads.delete(global_thread.id)
+            global_thread = None  # 스레드 초기화
             last_conversation_reset_time = current_time
-            thread = client.beta.threads.create()
-      
-        content = user_input
-        thread_message = client.beta.threads.messages.create(
-            thread_id=thread.id,
-            role='user',
-            content=f"{user_nickname} says: {content}"
-        )
-
-        # Execute our run
-        run = client.beta.threads.runs.create(
-            thread_id=thread.id,
-            assistant_id=assistant.id,
-        )
-
-        # Wait for completion
-        wait_on_run(run, thread)
-
-        # Retrieve all the messages added after our last user message
-        thread_messages = client.beta.threads.messages.list(
-            thread_id=thread.id, order="asc", after=thread_message.id
-        )
-        response_text = ""
-        for thread_message in thread_messages:
-            for c in thread_message.content:
-                response_text += c.text.value
-
-        clean_text = re.sub('【.*?】', '', response_text)
-        await message.channel.send(f"{clean_text}")
-
-        
-    return
-
 @app.event
 async def on_member_join(member):
     channel = app.get_channel(1087554522378948609)
