@@ -239,7 +239,6 @@ async def on_message(message):
         thread_message = client.beta.threads.messages.create(
           thread_id=thread.id,
           role='user',
-          content=content
           content = f"{user_nickname} says: {content}"
     )
 
