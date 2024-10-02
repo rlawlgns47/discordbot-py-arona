@@ -247,32 +247,32 @@ async def on_message(message):
 
 
           # Execute our run
-          run = client.beta.threads.runs.create(
-              thread_id=thread.id,
-              assistant_id=assistant.id,
-          )
+        run = client.beta.threads.runs.create(
+            thread_id=thread.id,
+            assistant_id=assistant.id,
+        )
 
           # Wait for completion
-          wait_on_run(run, thread)
+        wait_on_run(run, thread)
           # Retrieve all the messages added after our last user message
-          thread_messages = client.beta.threads.messages.list(
-              thread_id=thread.id, order="asc", after=thread_message.id
-          )
-          response_text = ""
-          for thread_message in thread_messages:
-              for c in thread_message.content:
-            response_text += c.text.value
-          clean_text = re.sub('【.*?】', '', response_text)
-          await message.channel.send(f"{clean_text}")
+        thread_messages = client.beta.threads.messages.list(
+            thread_id=thread.id, order="asc", after=thread_message.id
+        )
+        response_text = ""
+        for thread_message in thread_messages:
+            for c in thread_message.content:
+          response_text += c.text.value
+        clean_text = re.sub('【.*?】', '', response_text)
+        await message.channel.send(f"{clean_text}")
 
-          current_time = time.time()
-          time_elapsed = current_time - last_conversation_reset_time
+        current_time = time.time()
+        time_elapsed = current_time - last_conversation_reset_time
 
-          # 5분이 지나면 대화 기록 초기화
-          if time_elapsed >= 120:
+        # 5분이 지나면 대화 기록 초기화
+        if time_elapsed >= 120:
               # delete thread
-              thread = client.beta.threads.delete(thread.id)
-              last_conversation_reset_time = current_time
+            thread = client.beta.threads.delete(thread.id)
+            last_conversation_reset_time = current_time
 
 
 @app.event
