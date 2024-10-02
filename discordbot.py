@@ -273,7 +273,7 @@ async def on_message(message):
             thread = client.beta.threads.delete(thread.id)
             last_conversation_reset_time = current_time
             thread = client.beta.threads.create()
-
+    return
 
 @app.event
 async def on_member_join(member):
