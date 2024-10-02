@@ -43,7 +43,6 @@ thread = client.beta.threads.create()
 # 전역 변수 선언
 last_conversation_reset_time = time.time()
 conversation_history = []
-thread = []
 
 # Time interval to keep data in memory (in seconds)
 DATA_EXPIRATION_TIME = 3600
