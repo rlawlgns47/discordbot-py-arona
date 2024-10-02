@@ -274,7 +274,6 @@ async def on_message(message):
         thread = client.beta.threads.delete(thread.id)
         print("뇌 비웠다 후헤헤")
         last_conversation_reset_time = current_time
-    return
 
 
 @app.event
