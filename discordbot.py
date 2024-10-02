@@ -43,6 +43,7 @@ thread = client.beta.threads.create()
 # 전역 변수 선언
 last_conversation_reset_time = time.time()
 conversation_history = []
+thread = []
 
 # Time interval to keep data in memory (in seconds)
 DATA_EXPIRATION_TIME = 3600
@@ -268,7 +269,7 @@ async def on_message(message):
 
     # 5분이 지나면 대화 기록 초기화
     if time_elapsed >= 300:
-        thread_messages.clear()
+        thread.clear()
         last_conversation_reset_time = current_time
     return
 
