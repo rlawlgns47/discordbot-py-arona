@@ -267,7 +267,7 @@ async def on_message(message):
 
     # 5분이 지나면 대화 기록 초기화
     if time_elapsed >= 300:
-        thread_messages.clear()
+        thread_messages = []
         last_conversation_reset_time = current_time
     return
 
