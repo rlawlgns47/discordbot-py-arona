@@ -38,6 +38,7 @@ assistant = client.beta.assistants.retrieve(
     assistant_id = ASST
 )
 
+thread = client.beta.threads.create()
 
 # 이전 대화 내용을 담을 리스트
 # 전역 변수 선언
@@ -235,13 +236,11 @@ async def on_message(message):
         user_nickname = message.author.display_name
         user_input = text[4:]
       
-        thread = client.beta.threads.create()
-      
         content = user_input
         thread_message = client.beta.threads.messages.create(
             thread_id=thread.id,
             role='user',
-            content=f"{user_nickname} : {content}"
+            content=f"{user_nickname} says: {content}"
         )
 
         # Execute our run
@@ -269,10 +268,11 @@ async def on_message(message):
         time_elapsed = current_time - last_conversation_reset_time
 
         # 5분이 지나면 대화 기록 초기화
-        if time_elapsed >= 120:
+        if time_elapsed >= 300:
             # delete thread
             thread = client.beta.threads.delete(thread.id)
             last_conversation_reset_time = current_time
+            thread = client.beta.threads.create()
 
 
 @app.event
